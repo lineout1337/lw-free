@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Excavator OCTune © Created by NiceHash</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        body {
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            font-family: system-ui, Ubuntu, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            font-size: 14px;
+            background: black;
+        }
+
+        a {
+            color: rgb(48, 57, 182);
+            text-decoration: none;
+        }
+
+        h1 {
+            margin-bottom: 2rem;
+        }
+
+        .hidden {
+            visibility: hidden;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: row;
+            background: #010d15;
+            color: #ccc;
+            height: calc(100vh - 110px);
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .control-pannel {
+            padding: 2rem 1rem 2rem 2rem;
+            width: 65vw;
+        }
+
+        .log-pannel {
+            padding: 2rem .5rem 2rem 1rem;
+            width: 35vw;
+        }
+
+            .log-pannel button {
+                float: right;
+            }
+
+            .log-pannel label {
+                font-size: 16px;
+                font-weight: 600;
+            }
+
+        table {
+            width: 100%;
+            text-align: center;
+            margin: .5rem 0 1rem;
+        }
+
+        .set-oc {
+            display: flex;
+            flex-direction: column;
+            width: 50%;
+        }
+
+        .form-group {
+            display: flex;
+            width: 100%;
+            height: 1.2rem;
+            padding: 0.2rem;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+            .form-group label,
+            .form-group h4 {
+                margin-right: auto;
+            }
+
+            .form-group input {
+                margin-right: 0.2rem;
+                width: 3rem;
+            }
+
+        button {
+            margin-left: 5px;
+            padding: .1rem .5rem;
+            background: #08385c;
+            color: #fff;
+            font-weight: 600;
+            border-width: 1px;
+        }
+
+            button:focus {
+                outline: none;
+            }
+
+            button.fixed {
+                width: 2.5rem;
+            }
+
+            button:disabled {
+                filter: grayscale(1);
+                cursor: not-allowed;
+            }
+
+            button#stop_auto_tune {
+                background: #9f0909;
+            }
+
+            button#save-config {
+                background: #00aa00;
+            }
+
+            button#hard-reset {
+                background: #aa0000;
+            }
+
+            .button-box {
+                margin-top: .7rem;
+            }
+
+        .dials {
+            display: flex;
+            flex-direction: row;
+            column-gap: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        #selected-device {
+            width: auto;
+        }
+
+        break {
+            display: inline-block;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            row-gap: 1rem;
+            padding: 1rem;
+            background: #031a2a;
+            color: #eee;
+            padding-right: 16px;
+            padding-left: 16px;
+        }
+
+            footer p {
+                font-weight: 500;
+            }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            width: 135px;
+            margin: 5rem;
+            height: 10px;
+            padding: 0;
+            border-radius: 2px;
+            outline: none;
+            cursor: pointer;
+            background: #583c1d;
+        }
+
+            /*Chrome thumb*/
+            input[type="range"]::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                -webkit-border-radius: 5px;
+                height: 16px;
+                width: 16px;
+                border-radius: 5px;
+                background: #fba342;
+                border: 1px solid #c5c5c5;
+            }
+
+            /*Mozilla thumb*/
+            input[type="range"]::-moz-range-thumb {
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                -moz-border-radius: 5px;
+                height: 14px;
+                width: 14px;
+                border-radius: 5px;
+                background: #fba342;
+                border: 1px solid #c5c5c5;
+            }
+
+        #log-view-div {
+            height: calc(100vh - 180px);
+            overflow: auto;
+            margin-top: 1rem;
+            font-size: 13px;
+            display: flex;
+            flex-direction: column;
+            row-gap: .6rem;
+            word-break: break-word;
+        }
+
+        .set-oc {
+            display: inline-block;
+        }
+
+
+        @media (max-width: 600px) {
+            .control-pannel {
+                padding: 2rem 1rem 2rem 2rem;
+                width: auto;
+            }
+
+            .dials {
+                flex-direction: column;
+            }
+        }
+
+
+        @media (max-width: 1366px) {
+            .container {
+                padding: 2rem;
+                flex-direction: column;
+            }
+
+            .control-pannel {
+                padding: 0;
+                width: 100%;
+            }
+
+            .set-oc {
+                width: 100%;
+            }
+
+            .log-pannel {
+                padding: 0;
+                width: 100%;
+            }
+
+
+            #log-view-div {
+                height: calc(100vh - 1000px);
+            }
+        }
+
+
+
+
+        .log-class-normal {
+            color: #ccc;
+            font-family: "Lucida Console";
+            font-weight: 600;
+        }
+
+        .log-class-warning {
+            color: lightsalmon;
+            font-family: "Lucida Console";
+            font-weight: 600;
+        }
+
+        .log-class-error {
+            color: orangered;
+            font-family: "Lucida Console";
+            font-weight: 600;
+        }
+
+        .log-class-ocscanner {
+            color: greenyellow;
+            font-family: "Lucida Console";
+            font-weight: 600;
+        }
+
+        .log-class-autotune {
+            color: #3986fa;
+            font-family: "Lucida Console";
+            font-weight: 600;
+        }
+
+        .auto-tune-disable {
+        }
+
+        .temp-mem-high {
+            color: red;
+            font-weight: 600;
+        }
+
+        .temp-mem-med {
+            color: orange;
+            font-weight: 600;
+        }
+
+        .temp-mem-low {
+            color: forestgreen;
+        }
+    </style>
+    <script type="text/javascript" src="jquery.min.js"></script>
+    <script type="text/javascript" src="octune.js"></script>
+</head>
+
+<body onload="start_code()">
+    <div class="container">
+        <div class="control-pannel">
+            <h1>NiceHash QuickMiner OCTune ©</h1>
+
+            <h2>Excavator Health Monitor</h2>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>GPU ID</th>
+                        <th>GPU Name</th>
+                        <th>Temperature<br />(&#8451;)</th>
+                        <th>Fan<br />(RPM)</th>
+                        <th>Fan level</th>
+                        <th>Fan settings</th>
+                        <th>Core<br />(MHz)</th>
+                        <th>Core Limit<br />(MHz)</th>
+                        <th>Core Volt.<br />(mV)</th>
+                        <th>Memory<br />(MHz)</th>
+                        <th>
+                            Selected?<br />
+                            <input class="auto-tune-disable" type="checkbox" id="all-selected" onchange="all_selected_changed()">
+                            <label for="all-selected">All</label>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="table-main-health">
+                </tbody>
+            </table>
+
+
+            <h2>Excavator OC Tuner</h2>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>GPU ID</th>
+                        <th>GPU Name</th>
+                        <th>Min<br />KT</th>
+                        <th>Avg<br />KT</th>
+                        <th>UMed<br />KT</th>
+                        <th>HW<br />err</th>
+                        <th>HW<br />ok</th>
+                        <th>Core<br />Delta</th>
+                        <th>Mem<br />Delta</th>
+                        <th>Power<br />Lim (W)</th>
+                        <th>TDP<br />Lim (%)</th>
+                        <th>Power<br />Real (W)</th>
+                        <th>Speed<br />(MH/s)</th>
+                        <th>Eff. (kH/J)</th>
+                    </tr>
+                </thead>
+                <tbody id="table-main-oc">
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <th id="total-power">0</th>
+                        <th id="total-speed">0</th>
+                        <th id="total-eff">0</th>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <h2>General options</h2>
+            <div class="dials">
+                <div class="set-oc">
+                    <div class="form-group">
+                        <label for="refresh-time">Refresh time: </label>
+                        <input type="range" min="1" max="5" value="2" class="slider" id="refresh-time" onchange="refresh_change()" />
+                        <span style="display: flex;column-gap: 0.3rem;">
+                            <div id="refresh-time-text">2</div> seconds
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <label for="selected-device">Single selected device: </label>
+                        <select id="selected-device" onchange="pre_oc_fill()" class="auto-tune-disable"></select>
+                    </div>
+                    <div class="form-group"></div>
+                    <div class="form-group">
+                        <button onclick="location.reload()" class="auto-tune-disable">Refresh page</button>
+                        <button onclick="save_current_cmds()" class="auto-tune-disable" id="save-config">Save current configuration</button>
+                    </div>
+                    <div class="form-group button-box">
+                        <h4>Reset overclock: </h4>
+                        <button onclick="reset_oc(null)" class="auto-tune-disable">Single</button>
+                        <button onclick="reset_oc_selected()" class="auto-tune-disable">Selected</button>
+                        <button onclick="reset_oc_all()" class="auto-tune-disable">All</button>
+                    </div>
+                    <div class="form-group button-box">
+                        <h4>Reset everything (FORCE CLEAN): </h4>
+                        <button onclick="force_clean_all()" class="auto-tune-disable" id="hard-reset">For All Devices</button>
+                    </div>
+                </div>
+                <div class="set-oc">
+                    <h3>Fan management</h3>
+                    <div class="form-group">
+                        <label for="selected-fan-mode">Fan mode: </label>
+                        <select class="auto-tune-disable" id="selected-fan-mode">
+                            <option id="selected-fan-mode-0" value="0">Default/Auto</option>
+                            <option id="selected-fan-mode-1" value="1">Fixed speed</option>
+                            <option id="selected-fan-mode-2" value="2">Target GPU Temp</option>
+                            <option id="selected-fan-mode-3" value="3">Target GPU&VRAM/HotSpot Temp</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="selected-fan-speed">Fixed fan speed (%): </label>
+                        <input class="auto-tune-disable" type="text" id="selected-fan-speed" value="" size="2" onchange="change_fan_speed(0)" />
+                        <button class="fixed auto-tune-disable" onclick="change_fan_speed(-20)">-20</button>
+                        <button class="fixed auto-tune-disable" onclick="change_fan_speed(-5)">-5</button>
+                        <button class="fixed auto-tune-disable" onclick="change_fan_speed(5)">+5</button>
+                        <button class="fixed auto-tune-disable" onclick="change_fan_speed(20)">+20</button>
+                    </div>
+                    <div class="form-group">
+                        <label for="selected-fan-temp-gpu">Target GPU Temp. (&#8451;): </label>
+                        <input class="auto-tune-disable" type="text" id="selected-fan-temp-gpu" value="" size="2" />
+                        <button class="fixed auto-tune-disable" onclick="change_fan_temp_gpu(-20)">-20</button>
+                        <button class="fixed auto-tune-disable" onclick="change_fan_temp_gpu(-5)">-5</button>
+                        <button class="fixed auto-tune-disable" onclick="change_fan_temp_gpu(5)">+5</button>
+                        <button class="fixed auto-tune-disable" onclick="change_fan_temp_gpu(20)">+20</button>
+                    </div>
+                    <div class="form-group">
+                        <label for="selected-fan-temp-vram">Target VRAM/HotSpot Temp. (&#8451;): </label>
+                        <input class="auto-tune-disable" type="text" id="selected-fan-temp-vram" value="" size="2" />
+                        <button class="fixed auto-tune-disable" onclick="change_fan_temp_vram(-20)">-20</button>
+                        <button class="fixed auto-tune-disable" onclick="change_fan_temp_vram(-5)">-5</button>
+                        <button class="fixed auto-tune-disable" onclick="change_fan_temp_vram(5)">+5</button>
+                        <button class="fixed auto-tune-disable" onclick="change_fan_temp_vram(20)">+20</button>
+                    </div>
+                    <div class="form-group button-box">
+                        <span style="margin-right: auto">Apply fan settings: </span>
+                        <button onclick="apply_fan(null)" class="auto-tune-disable">Single</button>
+                        <button onclick="apply_fan_selected()" class="auto-tune-disable">Selected</button>
+                        <button onclick="apply_fan_all()" class="auto-tune-disable">All</button>
+                    </div>
+                </div>
+            </div>
+
+            <h2>Overclocking</h2>
+            <div class="dials">
+                <div class="set-oc">
+                    <h3>Classic method for overclocking (works for all cards)</h3>
+                    <div class="form-group">
+                        <label for="selected-core" id="core-delta-text">Core clock delta: </label>
+                        <input class="auto-tune-disable" type="text" id="selected-core" value="" size="3" />
+                        <button class="fixed auto-tune-disable" onclick="change_core_clock(-15)">-15</button>
+                        <button class="fixed auto-tune-disable" onclick="change_core_clock(15)">+15</button>
+                        <small id="core-delta-limits">(Min:-1000 Max:+500)</small><small id="core-max-limits" hidden>(Min:510 Max:1110)</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="selected-memory">Memory clock delta: </label>
+                        <input class="auto-tune-disable" type="text" id="selected-memory" value="" size="3" />
+                        <button class="fixed auto-tune-disable" onclick="change_mem_clock(-25)">-25</button>
+                        <button class="fixed auto-tune-disable" onclick="change_mem_clock(-10)">-10</button>
+                        <button class="fixed auto-tune-disable" onclick="change_mem_clock(10)">+10</button>
+                        <button class="fixed auto-tune-disable" onclick="change_mem_clock(25)">+25</button>
+                    </div>
+                    <div class="form-group">
+                        <label for="selected-power">Power limit (W): </label>
+                        <input class="auto-tune-disable" type="text" id="selected-power" value="" size="3" />
+                        <button class="fixed auto-tune-disable" onclick="change_power(-5)">-5</button>
+                        <button class="fixed auto-tune-disable" onclick="change_power(-2)">-2</button>
+                        <button class="fixed auto-tune-disable" onclick="change_power(2)">+2</button>
+                        <button class="fixed auto-tune-disable" onclick="change_power(5)">+5</button>
+                    </div>
+                    <div class="form-group">
+                        <input class="auto-tune-disable" type="checkbox" id="core-uvolt2" onclick="allow_uvolt2(null)">
+                        <label for="selected-core-volt2">Unlock max core voltage (mV): </label>
+                        <input class="auto-tune-disable" type="text" id="selected-core-volt2" value="" size="3" / disabled>
+                        <strong>(optional)</strong>
+                    </div>
+                    <div class="form-group button-box">
+                        <span style="margin-right: auto">Apply Overclock: </span>
+                        <button onclick="apply_oc(null)" class="auto-tune-disable">Single</button>
+                        <button onclick="apply_oc_selected()" class="auto-tune-disable">Selected</button>
+                        <button onclick="apply_oc_all()" class="auto-tune-disable">All</button>
+                    </div>
+                </div>
+                <div class="set-oc">
+                    <h3>Alternative method for overclocking (<span style="color:red;">not</span> supported for 1060, 1070 and 1080)</h3>
+                    <div class="form-group">
+                        <label for="selected-core-max">Core clock limit (0 = disable limit): </label>
+                        <input class="auto-tune-disable" type="text" id="selected-core-max" value="210" size="3" />
+                        <button class="fixed hidden"></button>
+                        <button class="fixed auto-tune-disable" onclick="change_core_clock_max(-15)">-15</button>
+                        <button class="fixed auto-tune-disable" onclick="change_core_clock_max(15)">+15</button>
+                        <button class="fixed hidden"></button>
+                    </div>
+                    <div class="form-group">
+                        <label for="selected-memory-abs">Memory clock (absolute): </label>
+                        <input class="auto-tune-disable" type="text" id="selected-memory-abs" value="" size="3" />
+                        <button class="fixed auto-tune-disable" onclick="change_mem_clock_abs(-25)">-25</button>
+                        <button class="fixed auto-tune-disable" onclick="change_mem_clock_abs(-10)">-10</button>
+                        <button class="fixed auto-tune-disable" onclick="change_mem_clock_abs(10)">+10</button>
+                        <button class="fixed auto-tune-disable" onclick="change_mem_clock_abs(25)">+25</button>
+                    </div>
+                    <div class="form-group">
+                        <p style="margin-right: auto;"><b>Power limit is automatic! Core clock limit determines power limit.</b></p>
+                    </div>
+                    <div class="form-group">
+                        <input class="auto-tune-disable" type="checkbox" id="core-uvolt" onclick="allow_uvolt(null)">
+                        <label for="selected-core-volt">Unlock core undervolt (mV): </label>
+                        <input class="auto-tune-disable" type="text" id="selected-core-volt" value="" size="3" / disabled>
+                        <strong>(optional)</strong>
+                    </div>
+                    <div class="form-group button-box">
+                        <span style="margin-right: auto">Apply Overclock: </span>
+                        <button onclick="apply_oc_alt(null)" class="auto-tune-disable">Single</button>
+                        <button onclick="apply_oc_selected_alt()" class="auto-tune-disable">Selected</button>
+                        <button onclick="apply_oc_all_alt()" class="auto-tune-disable">All</button>
+                    </div>
+                </div>
+            </div>
+            <h2>Autotune (experimental)</h2>
+            <div class="dials">
+                <div class="set-oc">
+                    <h3><span style="color:red;">Not</span> supported for 1060, 1070 and 1080</h3>
+                    <div class="form-group">
+                        <label for="at-memory">Autotune for absolute memory: <br />(min: <span id="at-mem-min"></span>, max: <span id="at-mem-max"></span>) </label>
+                        <input class="auto-tune-disable" type="text" id="at-memory" value="" size="3" />
+                        <button class="fixed auto-tune-disable" onclick="at_change_mem_clock(-50)">-50</button>
+                        <button class="fixed auto-tune-disable" onclick="at_change_mem_clock(-25)">-25</button>
+                        <button class="fixed auto-tune-disable" onclick="at_change_mem_clock(25)">+25</button>
+                        <button class="fixed auto-tune-disable" onclick="at_change_mem_clock(50)">+50</button>
+                    </div>
+                    <div class="form-group">
+                        <label for="at-core-start">Starting core clock limit (min: 210): </label>
+                        <input class="auto-tune-disable" type="text" id="at-core-start" value="480" size="3" />
+                        <button class="fixed hidden"></button>
+                        <button class="fixed auto-tune-disable" onclick="at_change_core_limit_start(-15)">-15</button>
+                        <button class="fixed auto-tune-disable" onclick="at_change_core_limit_start(15)">+15</button>
+                        <button class="fixed hidden"></button>
+                    </div>
+                    <div class="form-group">
+                        <label for="at-core-end">Ending core clock limit (max: 2100): </label>
+                        <input class="auto-tune-disable" type="text" id="at-core-end" value="1605" size="3" />
+                        <button class="fixed hidden"></button>
+                        <button class="fixed auto-tune-disable" onclick="at_change_core_limit_end(-15)">-15</button>
+                        <button class="fixed auto-tune-disable" onclick="at_change_core_limit_end(15)">+15</button>
+                        <button class="fixed hidden"></button>
+
+                    </div>
+                    <div class="form-group">
+                        <span style="margin-right: auto; width: 100%;">Tune for: </span>
+                        <input class="auto-tune-disable" type="radio" id="at-eff" name="at-target" value="Efficiency" checked>
+                        <label for="at-eff" style="margin-right: 1rem;">Efficiency</label>
+                        <input class="auto-tune-disable" type="radio" id="at-speed" name="at-target" value="Speed">
+                        <label for="at-speed">Speed</label>
+                    </div>
+                    <div class="form-group button-box">
+                        <span style="margin-right: auto">Auto-tune: </span>
+                        <button onclick="auto_tune_start(null)" class="auto-tune-disable" id="at-enable">Start Single</button>
+                        <button onclick="auto_tune_start_selected()" class="auto-tune-disable" id="at-enable">Start Selected</button>
+                        <button id="stop_auto_tune" disabled onclick="auto_tune_finish_now()">Stop</button>
+                    </div>
+                </div>
+                <div class="set-oc">
+                </div>
+            </div>
+        </div>
+        <div class="log-pannel">
+            <button onclick="clear_logs()">Clear event logs</button>
+            <label for="log-view">Events:</label>
+            <div id="log-view-div"></div>
+        </div>
+    </div>
+
+    <footer>
+        <h4>
+            Instructions how to use OCTune are available at
+            <a href="https://github.com/nicehash/NiceHashQuickMiner/wiki/OCTune" target="_blank">NiceHash QuickMiner GitHub Wiki</a>
+        </h4>
+
+        <p> NVIDIA NVML library has a memleak in function nvmlDeviceGetPowerUsage. Make sure you do not keep OCTune open when you do not need it.<br />If you keep it open, end result can be complete system memory exhaustion and Windows crash.</p>
+    </footer>
+
+</body>
+
+</html>
